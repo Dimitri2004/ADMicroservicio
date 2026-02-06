@@ -31,4 +31,8 @@ public class LosJoJosService {
             System.out.println("Error al exportar. "+e.getMessage());
         }
     }
+    public List<Losjojos> findAll() {
+        return losJojosRepository.findAll();
+    }
+    
 }
