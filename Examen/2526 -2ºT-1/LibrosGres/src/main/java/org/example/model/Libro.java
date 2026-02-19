@@ -1,12 +1,22 @@
 package org.example.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "libros") // Assuming a table named 'libros' in PostgreSQL
 public class Libro {
-    private int id;
+    @Id
+    private String id;
     private String titulo;
     private String autor;
     private int anoPublicacion;
 
-    public Libro(int id, String titulo, String autor, int anoPublicacion) {
+    public Libro() {
+    }
+
+    public Libro(String id, String titulo, String autor, int anoPublicacion) {
         this.id = id;
         this.titulo = titulo;
         this.autor = autor;
@@ -14,11 +24,11 @@ public class Libro {
     }
 
     // Getters and Setters
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -49,7 +59,7 @@ public class Libro {
     @Override
     public String toString() {
         return "Libro{" +
-               "id=" + id +
+               "id='" + id + '\'' +
                ", titulo='" + titulo + '\'' +
                ", autor='" + autor + '\'' +
                ", anoPublicacion=" + anoPublicacion +

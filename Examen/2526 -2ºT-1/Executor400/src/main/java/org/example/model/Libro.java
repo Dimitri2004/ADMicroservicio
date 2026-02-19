@@ -1,39 +1,34 @@
 package org.example.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
-import java.util.List;
-
-@Document(collection = "Libros")
+@Entity
+@Table(name = "libros") // Assuming a table named 'libros' in PostgreSQL
 public class Libro {
     @Id
-    private Long id; // Corresponds to Saga's ID
-
-    private String titulo; // From Saga
-    private int parte; // From Saga
-    private int anoinicio; // From Saga
-    private String ambientacion; // From Saga
-
-    private List<PersonajeDetalle> personajes; // Embedded Personaxe details
+    private String id;
+    private String titulo;
+    private String autor;
+    private int anoPublicacion;
 
     public Libro() {
     }
 
-    public Libro(Long id, String titulo, int parte, int anoinicio, String ambientacion, List<PersonajeDetalle> personajes) {
+    public Libro(String id, String titulo, String autor, int anoPublicacion) {
         this.id = id;
         this.titulo = titulo;
-        this.parte = parte;
-        this.anoinicio = anoinicio;
-        this.ambientacion = ambientacion;
-        this.personajes = personajes;
+        this.autor = autor;
+        this.anoPublicacion = anoPublicacion;
     }
 
-    public Long getId() {
+    // Getters and Setters
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -45,65 +40,29 @@ public class Libro {
         this.titulo = titulo;
     }
 
-    public int getParte() {
-        return parte;
+    public String getAutor() {
+        return autor;
     }
 
-    public void setParte(int parte) {
-        this.parte = parte;
+    public void setAutor(String autor) {
+        this.autor = autor;
     }
 
-    public int getAnoinicio() {
-        return anoinicio;
+    public int getAnoPublicacion() {
+        return anoPublicacion;
     }
 
-    public void setAnoinicio(int anoinicio) {
-        this.anoinicio = anoinicio;
+    public void setAnoPublicacion(int anoPublicacion) {
+        this.anoPublicacion = anoPublicacion;
     }
 
-    public String getAmbientacion() {
-        return ambientacion;
-    }
-
-    public void setAmbientacion(String ambientacion) {
-        this.ambientacion = ambientacion;
-    }
-
-    public List<PersonajeDetalle> getPersonajes() {
-        return personajes;
-    }
-
-    public void setPersonajes(List<PersonajeDetalle> personajes) {
-        this.personajes = personajes;
-    }
-
-    // Inner class for Personaje details
-    public static class PersonajeDetalle {
-        private String nome; // From Personaxe
-        private String stand; // From Personaxe
-
-        public PersonajeDetalle() {
-        }
-
-        public PersonajeDetalle(String nome, String stand) {
-            this.nome = nome;
-            this.stand = stand;
-        }
-
-        public String getNome() {
-            return nome;
-        }
-
-        public void setNome(String nome) {
-            this.nome = nome;
-        }
-
-        public String getStand() {
-            return stand;
-        }
-
-        public void setStand(String stand) {
-            this.stand = stand;
-        }
+    @Override
+    public String toString() {
+        return "Libro{" +
+               "id='" + id + '\'' +
+               ", titulo='" + titulo + '\'' +
+               ", autor='" + autor + '\'' +
+               ", anoPublicacion=" + anoPublicacion +
+               '}';
     }
 }

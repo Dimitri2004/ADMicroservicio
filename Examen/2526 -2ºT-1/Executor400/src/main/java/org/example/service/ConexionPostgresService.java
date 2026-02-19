@@ -29,12 +29,12 @@ public class ConexionPostgresService {
             );
             return response.getBody() != null ? response.getBody() : Collections.emptyList();
         } catch (HttpClientErrorException e) {
-            System.out.println("Erro: " + e.getMessage());
+            System.out.println("Erro al buscar libros en Postgres: " + e.getMessage());
             return Collections.emptyList();
         }
     }
 
-    public boolean borrarLibro(Long id) {
+    public boolean borrarLibro(String id) { // Changed ID type to String
         try {
             String url = POSTGRES_BASE_URL_LIBRO + "/" + id;
             ResponseEntity<Void> response = restTemplate.exchange(
@@ -42,7 +42,7 @@ public class ConexionPostgresService {
             );
             return true;
         } catch (HttpClientErrorException e) {
-            System.out.println("NonNonNon non dixeche-la palabra maxica jajaja jajaja " + e.getMessage());
+            System.out.println("Error al borrar libro en Postgres: " + e.getMessage());
             return false;
         }
     }
@@ -59,18 +59,18 @@ public class ConexionPostgresService {
             );
             return response.getBody();
         } catch (HttpClientErrorException e) {
-            System.out.println("Erro xenerico: " + e.getMessage());
+            System.out.println("Erro al crear libro en Postgres: " + e.getMessage());
             return null;
         }
     }
 
-    public Optional<Libro> libroPorID(Long id) {
+    public Optional<Libro> libroPorID(String id) { // Changed ID type to String
         try {
             String url = POSTGRES_BASE_URL_LIBRO + "/" + id;
             ResponseEntity<Libro> response = restTemplate.exchange(url, HttpMethod.GET, null, Libro.class);
             return Optional.ofNullable(response.getBody());
         } catch (HttpClientErrorException e) {
-            System.out.println("Mensaxe xenerica " + e.getMessage());
+            System.out.println("Error al buscar libro por ID en Postgres: " + e.getMessage());
             return Optional.empty();
         }
     }
@@ -82,7 +82,7 @@ public class ConexionPostgresService {
             List<Libro> libros = response.getBody();
             return libros != null && !libros.isEmpty() ? Optional.of(libros.get(0)) : Optional.empty();
         } catch (HttpClientErrorException e) {
-            System.out.println("Mensaxe xenerica " + e.getMessage());
+            System.out.println("Error al buscar libro por título en Postgres: " + e.getMessage());
             return Optional.empty();
         }
     }

@@ -28,7 +28,7 @@ public class RestLibros {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Libro> getLibroById(@PathVariable int id) {
+    public ResponseEntity<Libro> getLibroById(@PathVariable String id) {
         Optional<Libro> libro = libroService.getLibroById(id);
         return libro.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                     .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -45,7 +45,7 @@ public class RestLibros {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Libro> updateLibro(@PathVariable int id, @RequestBody LibroRequest libroRequest) {
+    public ResponseEntity<Libro> updateLibro(@PathVariable String id, @RequestBody LibroRequest libroRequest) {
         Libro updatedLibro = libroService.updateLibro(
                 id,
                 libroRequest.getTitulo(),
@@ -56,7 +56,7 @@ public class RestLibros {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLibro(@PathVariable int id) {
+    public ResponseEntity<Void> deleteLibro(@PathVariable String id) {
         libroService.deleteLibro(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

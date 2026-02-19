@@ -2,10 +2,10 @@ package org.example.service;
 
 import org.example.model.Libro;
 import org.example.repository.LibroRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import org.springframework.stereotype.Service;
 
 @Service
 public class LibroService {
@@ -16,11 +16,14 @@ public class LibroService {
     }
 
     public Libro createLibro(String titulo, String autor, int anoPublicacion) {
-        Libro newLibro = new Libro(0, titulo, autor, anoPublicacion);
+        Libro newLibro = new Libro(); // Use no-arg constructor
+        newLibro.setTitulo(titulo);
+        newLibro.setAutor(autor);
+        newLibro.setAnoPublicacion(anoPublicacion);
         return libroRepository.save(newLibro);
     }
 
-    public Optional<Libro> getLibroById(int id) {
+    public Optional<Libro> getLibroById(String id) {
         return libroRepository.findById(id);
     }
 
@@ -28,16 +31,16 @@ public class LibroService {
         return libroRepository.findAll();
     }
 
-    public Libro updateLibro(int id, String titulo, String autor, int anoPublicacion) {
+    public Libro updateLibro(String id, String titulo, String autor, int anoPublicacion) {
         return libroRepository.findById(id).map(existingLibro -> {
             existingLibro.setTitulo(titulo);
             existingLibro.setAutor(autor);
             existingLibro.setAnoPublicacion(anoPublicacion);
             return libroRepository.save(existingLibro);
-        }).orElse(null); // Or throw an exception
+        }).orElse(null); // Or throw an exception if not found
     }
 
-    public void deleteLibro(int id) {
+    public void deleteLibro(String id) {
         libroRepository.deleteById(id);
     }
 
