@@ -1,6 +1,6 @@
 package org.example.service;
 
-import org.example.model.Saga;
+import org.example.model.Libro;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConexionPostgresService {
@@ -17,17 +18,14 @@ public class ConexionPostgresService {
     @Autowired
     private RestTemplate restTemplate;
 
+    private static final String POSTGRES_BASE_URL_LIBRO = "http://localhost:8081/postgres/libros";
 
-    private static final String POSTGRES_BASE_URL_SAGA = "http://localhost:8081/postgres/sagas";
-
-
-
-    public List<Saga> buscarSagas() {
+    public List<Libro> buscarLibros() {
         try {
-            String url = POSTGRES_BASE_URL_SAGA;
-            ResponseEntity<List<Saga>> response = restTemplate.exchange(
+            String url = POSTGRES_BASE_URL_LIBRO;
+            ResponseEntity<List<Libro>> response = restTemplate.exchange(
                     url, HttpMethod.GET, null,
-                    new ParameterizedTypeReference<List<Saga>>() {}
+                    new ParameterizedTypeReference<List<Libro>>() {}
             );
             return response.getBody() != null ? response.getBody() : Collections.emptyList();
         } catch (HttpClientErrorException e) {
@@ -36,9 +34,9 @@ public class ConexionPostgresService {
         }
     }
 
-    public boolean borrarSaga(Long id) {
+    public boolean borrarLibro(Long id) {
         try {
-            String url = POSTGRES_BASE_URL_SAGA+"/"+id;
+            String url = POSTGRES_BASE_URL_LIBRO + "/" + id;
             ResponseEntity<Void> response = restTemplate.exchange(
                     url, HttpMethod.DELETE, null, Void.class
             );
@@ -49,15 +47,15 @@ public class ConexionPostgresService {
         }
     }
 
-    public Saga crearSaga(Saga saga) {
+    public Libro crearLibro(Libro libro) {
         try {
-            String url = POSTGRES_BASE_URL_SAGA;
+            String url = POSTGRES_BASE_URL_LIBRO;
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Saga> request = new HttpEntity<>(saga, headers);
+            HttpEntity<Libro> request = new HttpEntity<>(libro, headers);
 
-            ResponseEntity<Saga> response = restTemplate.exchange(
-                    url, HttpMethod.POST, request, Saga.class
+            ResponseEntity<Libro> response = restTemplate.exchange(
+                    url, HttpMethod.POST, request, Libro.class
             );
             return response.getBody();
         } catch (HttpClientErrorException e) {
@@ -66,28 +64,26 @@ public class ConexionPostgresService {
         }
     }
 
-
-    public Saga sagaPorID(Long id) {
+    public Optional<Libro> libroPorID(Long id) {
         try {
-            String url = POSTGRES_BASE_URL_SAGA+"/"+id;
-            HttpEntity<Saga> response = restTemplate.exchange(url, HttpMethod.GET, null, Saga.class);
-            return response.getBody();
+            String url = POSTGRES_BASE_URL_LIBRO + "/" + id;
+            ResponseEntity<Libro> response = restTemplate.exchange(url, HttpMethod.GET, null, Libro.class);
+            return Optional.ofNullable(response.getBody());
         } catch (HttpClientErrorException e) {
             System.out.println("Mensaxe xenerica " + e.getMessage());
-            return null;
+            return Optional.empty();
         }
     }
 
-    public Saga sagaPorTitulo(String titulo) {
+    public Optional<Libro> libroPorTitulo(String titulo) {
         try {
-            String url = POSTGRES_BASE_URL_SAGA+"/titulo/"+titulo;
-            HttpEntity<List<Saga>> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<Saga>>() {});
-            List<Saga> s = response.getBody();
-            return s.get(0);
+            String url = POSTGRES_BASE_URL_LIBRO + "/titulo/" + titulo;
+            ResponseEntity<List<Libro>> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<Libro>>() {});
+            List<Libro> libros = response.getBody();
+            return libros != null && !libros.isEmpty() ? Optional.of(libros.get(0)) : Optional.empty();
         } catch (HttpClientErrorException e) {
             System.out.println("Mensaxe xenerica " + e.getMessage());
-            return null;
+            return Optional.empty();
         }
     }
-
 }

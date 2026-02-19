@@ -1,6 +1,6 @@
 package org.example.service;
 
-import org.example.model.Saga;
+import org.example.model.Libro; // Import the Libro model
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -17,77 +17,73 @@ public class ConexionService {
     @Autowired
     private RestTemplate restTemplate;
 
+    // Assuming an external PostgreSQL service for Libros at this URL
+    private static final String POSTGRES_BASE_URL_LIBRO = "http://localhost:8081/postgres/libros";
 
-    private static final String POSTGRES_BASE_URL_SAGA = "http://localhost:8081/postgres/sagas";
-
-
-
-    public List<Saga> buscarSagas() {
+    public List<Libro> buscarLibros() {
         try {
-            String url = POSTGRES_BASE_URL_SAGA;
-            ResponseEntity<List<Saga>> response = restTemplate.exchange(
+            String url = POSTGRES_BASE_URL_LIBRO;
+            ResponseEntity<List<Libro>> response = restTemplate.exchange(
                     url, HttpMethod.GET, null,
-                    new ParameterizedTypeReference<List<Saga>>() {}
+                    new ParameterizedTypeReference<List<Libro>>() {}
             );
             return response.getBody() != null ? response.getBody() : Collections.emptyList();
         } catch (HttpClientErrorException e) {
-            System.out.println("Erro: " + e.getMessage());
+            System.out.println("Error al buscar libros: " + e.getMessage());
             return Collections.emptyList();
         }
     }
 
-    public boolean borrarSaga(Long id) {
+    public boolean borrarLibro(String id) {
         try {
-            String url = POSTGRES_BASE_URL_SAGA+"/"+id;
-            ResponseEntity<Void> response = restTemplate.exchange(
+            String url = POSTGRES_BASE_URL_LIBRO + "/" + id;
+            restTemplate.exchange(
                     url, HttpMethod.DELETE, null, Void.class
             );
             return true;
         } catch (HttpClientErrorException e) {
-            System.out.println("NonNonNon non dixeche-la palabra maxica jajaja jajaja " + e.getMessage());
+            System.out.println("Error al borrar libro con ID " + id + ": " + e.getMessage());
             return false;
         }
     }
 
-    public Saga crearSaga(Saga saga) {
+    public Libro crearLibro(Libro libro) {
         try {
-            String url = POSTGRES_BASE_URL_SAGA;
+            String url = POSTGRES_BASE_URL_LIBRO;
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Saga> request = new HttpEntity<>(saga, headers);
+            HttpEntity<Libro> request = new HttpEntity<>(libro, headers);
 
-            ResponseEntity<Saga> response = restTemplate.exchange(
-                    url, HttpMethod.POST, request, Saga.class
+            ResponseEntity<Libro> response = restTemplate.exchange(
+                    url, HttpMethod.POST, request, Libro.class
             );
             return response.getBody();
         } catch (HttpClientErrorException e) {
-            System.out.println("Erro xenerico: " + e.getMessage());
+            System.out.println("Error al crear libro: " + e.getMessage());
             return null;
         }
     }
 
-
-    public Saga sagaPorID(Long id) {
+    public Libro libroPorID(String id) {
         try {
-            String url = POSTGRES_BASE_URL_SAGA+"/"+id;
-            HttpEntity<Saga> response = restTemplate.exchange(url, HttpMethod.GET, null, Saga.class);
+            String url = POSTGRES_BASE_URL_LIBRO + "/" + id;
+            ResponseEntity<Libro> response = restTemplate.exchange(url, HttpMethod.GET, null, Libro.class);
             return response.getBody();
         } catch (HttpClientErrorException e) {
-            System.out.println("Mensaxe xenerica " + e.getMessage());
+            System.out.println("Error al buscar libro por ID " + id + ": " + e.getMessage());
             return null;
         }
     }
 
-    public Saga sagaPorTitulo(String titulo) {
+    public Libro libroPorTitulo(String titulo) {
         try {
-            String url = POSTGRES_BASE_URL_SAGA+"/titulo/"+titulo;
-            HttpEntity<List<Saga>> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<Saga>>() {});
-            List<Saga> s = response.getBody();
-            return s.get(0);
+            String url = POSTGRES_BASE_URL_LIBRO + "/titulo/" + titulo;
+            ResponseEntity<List<Libro>> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<Libro>>() {});
+            List<Libro> libros = response.getBody();
+            return (libros != null && !libros.isEmpty()) ? libros.get(0) : null;
         } catch (HttpClientErrorException e) {
-            System.out.println("Mensaxe xenerica " + e.getMessage());
+            System.out.println("Error al buscar libro por título '" + titulo + "': " + e.getMessage());
             return null;
         }
     }
-
 }

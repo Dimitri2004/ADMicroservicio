@@ -1,8 +1,6 @@
 package org.example;
 
-import org.example.model.Losjojos;
-import org.example.model.Personaxe;
-import org.example.model.Saga;
+import org.example.model.Libro;
 import org.example.service.ConexionMongoService;
 import org.example.service.ConexionPostgresService;
 import org.example.service.JSONService;
@@ -11,66 +9,72 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class Secuencia {
 
     @Autowired
-    private ConexionPostgresService conexionService;
+    private ConexionPostgresService conexionPostgresService;
     @Autowired
-    private ConexionMongoService mongoService;
+    private ConexionMongoService conexionMongoService;
     @Autowired
-    private JSONService JSONService;
+    private JSONService jsonService;
 
 
     public void executar() {
 
-        ArrayList<Personaxe> ps = new ArrayList<>();
-        Personaxe p1 = new Personaxe();
-        p1.setNome("Giorno Giovanna");
-        p1.setStand("Gold Experience");
-        ps.add(p1);
+        ArrayList<Libro.PersonajeDetalle> personajes = new ArrayList<>();
+        Libro.PersonajeDetalle p1 = new Libro.PersonajeDetalle("Giorno Giovanna", "Gold Experience");
+        personajes.add(p1);
 
-        Personaxe p2 = new Personaxe();
-        p2.setNome("Bruno Bucciarati");
-        p2.setStand("Sticky Fingers");
-        ps.add(p2);
+        Libro.PersonajeDetalle p2 = new Libro.PersonajeDetalle("Bruno Bucciarati", "Sticky Fingers");
+        personajes.add(p2);
 
-        Personaxe p3 = new Personaxe();
-        p3.setNome("Guido Mista");
-        p3.setStand("Sex Pistols");
-        ps.add(p3);
+        Libro.PersonajeDetalle p3 = new Libro.PersonajeDetalle("Guido Mista", "Sex Pistols");
+        personajes.add(p3);
 
-        Saga saga = new Saga();
-        saga.setTitulo("Vento Aureo");
-        saga.setParte(5);
-        saga.setAmbientacion("Italia");
-        saga.setAnoinicio(2001);
-        saga.setPersonaxes(ps);
+        Libro libro1 = new Libro();
+        libro1.setTitulo("Vento Aureo");
+        libro1.setParte(5);
+        libro1.setAmbientacion("Italia");
+        libro1.setAnoinicio(2001);
+        libro1.setPersonajes(personajes);
 
-        saga = conexionService.crearSaga(saga);
+        // Create a book in Postgres
+        libro1 = conexionPostgresService.crearLibro(libro1);
+        System.out.println("Libro creado en Postgres: " + libro1.getTitulo());
 
+        // Find a book by ID from Postgres and save it to Mongo
+        Optional<Libro> libro2Optional = conexionPostgresService.libroPorID(1L); // Assuming ID 1 exists
+        libro2Optional.ifPresent(libro -> {
+            conexionMongoService.crearLibro(libro);
+            System.out.println("Libro con ID 1 de Postgres guardado en Mongo: " + libro.getTitulo());
+        });
 
-        Saga saga2 = conexionService.sagaPorID(2L);
-        mongoService.crearSaga(saga2);
+        // Find a book by title from Postgres and save it to Mongo
+        Optional<Libro> libro3Optional = conexionPostgresService.libroPorTitulo("Stardust Crusaders");
+        libro3Optional.ifPresent(libro -> {
+            conexionMongoService.crearLibro(libro);
+            System.out.println("Libro 'Stardust Crusaders' de Postgres guardado en Mongo: " + libro.getTitulo());
+        });
 
-        Saga sagaC = conexionService.sagaPorTitulo("Stardust Crusaders");
-        mongoService.crearSaga(sagaC);
-
-        List<Saga> sagas = conexionService.buscarSagas();
-        for (Saga s:sagas){
-            mongoService.crearSaga(s);
+        // Get all books from Postgres and save them to Mongo
+        List<Libro> allLibrosPostgres = conexionPostgresService.buscarLibros();
+        for (Libro libro : allLibrosPostgres) {
+            conexionMongoService.crearLibro(libro);
+            System.out.println("Libro de Postgres guardado en Mongo: " + libro.getTitulo());
         }
 
-        Losjojos losjojos = new Losjojos();
-        losjojos.setSagas(sagas);
-        mongoService.crearLosjojos(losjojos);
+        // Export all books from Mongo to JSON
+        List<Libro> allLibrosMongo = conexionMongoService.buscarLibros();
+        jsonService.exportarJSONLibros(allLibrosMongo);
+        System.out.println("Libros exportados a JSON.");
 
-        JSONService.exportarJSONLosJojos(mongoService.buscarJoJos());
-        JSONService.exportarJSONSagass(mongoService.buscarSagas());
-
-        conexionService.borrarSaga(saga.getId());
-        conexionService.borrarSaga(saga.getId());
-
+        // Delete the created book from Postgres
+        if (libro1.getId() != null) {
+            boolean deleted = conexionPostgresService.borrarLibro(libro1.getId());
+            System.out.println("Libro con ID " + libro1.getId() + " borrado de Postgres: " + deleted);
+        }
     }
 }

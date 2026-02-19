@@ -1,123 +1,44 @@
 package org.example.service;
 
-import org.example.model.Losjojos;
-import org.example.model.Saga;
+import org.example.model.Libro;
+import org.example.repository.LibroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConexionMongoService {
 
     @Autowired
-    private RestTemplate restTemplate;
+    private LibroRepository libroRepository;
 
-    private static final String POSTGRES_BASE_URL_SAGAS = "http://localhost:8080/Mongo/sagas";
-    private static final String POSTGRES_BASE_URL_JOJOS = "http://localhost:8080/Mongo/losjojos";
-
-
-    public List<Saga> buscarSagas() {
-        try {
-            String url = POSTGRES_BASE_URL_SAGAS;
-            ResponseEntity<List<Saga>> response = restTemplate.exchange(
-                    url, HttpMethod.GET, null,
-                    new ParameterizedTypeReference<List<Saga>>() {}
-            );
-            return response.getBody() != null ? response.getBody() : Collections.emptyList();
-        } catch (HttpClientErrorException e) {
-            System.out.println("Erro: " + e.getMessage());
-            return Collections.emptyList();
-        }
-    }
-    public List<Losjojos> buscarJoJos() {
-        try {
-            String url = POSTGRES_BASE_URL_JOJOS;
-            ResponseEntity<List<Losjojos>> response = restTemplate.exchange(
-                    url, HttpMethod.GET, null,
-                    new ParameterizedTypeReference<List<Losjojos>>() {}
-            );
-            return response.getBody() != null ? response.getBody() : Collections.emptyList();
-        } catch (HttpClientErrorException e) {
-            System.out.println("Erro: " + e.getMessage());
-            return Collections.emptyList();
-        }
+    public List<Libro> buscarLibros() {
+        return libroRepository.findAll();
     }
 
+    public Libro crearLibro(Libro libro) {
+        return libroRepository.save(libro);
+    }
 
-    public boolean borrarSaga(Long id) {
-        try {
-            String url = POSTGRES_BASE_URL_SAGAS+"/"+id;
-            ResponseEntity<Void> response = restTemplate.exchange(
-                    url, HttpMethod.DELETE, null, Void.class
-            );
+    public boolean borrarLibro(Long id) {
+        if (libroRepository.existsById(id)) {
+            libroRepository.deleteById(id);
             return true;
-        } catch (HttpClientErrorException e) {
-            System.out.println("NonNonNon non dixeche-la palabra maxica jajaja jajaja " + e.getMessage());
-            return false;
         }
+        return false;
     }
 
-    public Saga crearSaga(Saga saga) {
-        try {
-            String url = POSTGRES_BASE_URL_SAGAS;
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Saga> request = new HttpEntity<>(saga, headers);
-
-            ResponseEntity<Saga> response = restTemplate.exchange(
-                    url, HttpMethod.POST, request, Saga.class
-            );
-            return response.getBody();
-        } catch (HttpClientErrorException e) {
-            System.out.println("Erro xenerico: " + e.getMessage());
-            return null;
-        }
-    }
-    public Losjojos crearLosjojos(Losjojos Losjojos) {
-        try {
-            String url = POSTGRES_BASE_URL_JOJOS;
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Losjojos> request = new HttpEntity<>(Losjojos, headers);
-
-            ResponseEntity<Losjojos> response = restTemplate.exchange(
-                    url, HttpMethod.POST, request, Losjojos.class
-            );
-            return response.getBody();
-        } catch (HttpClientErrorException e) {
-            System.out.println("Erro xenerico: " + e.getMessage());
-            return null;
-        }
+    public Optional<Libro> libroPorID(Long id) {
+        return libroRepository.findById(id);
     }
 
-
-    public Saga sagaPorID(Long id) {
-        try {
-            String url = POSTGRES_BASE_URL_SAGAS+"/"+id;
-            HttpEntity<Saga> response = restTemplate.exchange(url, HttpMethod.GET, null, Saga.class);
-            return response.getBody();
-        } catch (HttpClientErrorException e) {
-            System.out.println("Mensaxe xenerica " + e.getMessage());
-            return null;
-        }
+    public Optional<Libro> libroPorTitulo(String titulo) {
+        // Assuming you might want to add a custom method to LibroRepository for this
+        // For now, we'll filter all books.
+        return libroRepository.findAll().stream()
+                .filter(libro -> libro.getTitulo().equalsIgnoreCase(titulo))
+                .findFirst();
     }
-
-    public Saga sagaPorTitulo(String titulo) {
-        try {
-            String url = POSTGRES_BASE_URL_SAGAS+"/titulo/"+titulo;
-            HttpEntity<List<Saga>> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<Saga>>() {});
-            List<Saga> s = response.getBody();
-            return s.get(0);
-        } catch (HttpClientErrorException e) {
-            System.out.println("Mensaxe xenerica " + e.getMessage());
-            return null;
-        }
-    }
-
 }
