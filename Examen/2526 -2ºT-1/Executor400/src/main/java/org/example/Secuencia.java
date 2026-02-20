@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.export.XmlExportService;
 import org.example.model.Libro;
 import org.example.service.ConexionMongoService;
 import org.example.service.ConexionPostgresService;
@@ -20,7 +21,8 @@ public class Secuencia {
     private ConexionMongoService conexionMongoService;
     @Autowired
     private JSONService jsonService;
-
+    @Autowired
+    private XmlExportService xmlExportService; // Inyectar el nuevo servicio
 
     public void executar() {
 
@@ -60,6 +62,9 @@ public class Secuencia {
         List<Libro> allLibrosMongo = conexionMongoService.buscarLibros();
         jsonService.exportarJSONLibros(allLibrosMongo);
         System.out.println("\nLibros exportados a JSON.");
+
+        // Exportar los mismos libros a XML
+        xmlExportService.exportarLibrosAXml(allLibrosMongo);
 
 //        // Delete the created book from Postgres
 //        if (libro1.getId() != null) {
