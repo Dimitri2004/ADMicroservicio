@@ -1,16 +1,18 @@
 package org.example.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "libros") // Assuming a table named 'libros' in PostgreSQL
 public class Libro {
     @Id
+    @Column(name = "id")
     private String id;
+    @Column(name = "titulo")
     private String titulo;
+    @Column(name = "autor")
     private String autor;
+    @Column(name = "ano_publicacion")
     private int anoPublicacion;
 
     public Libro() {

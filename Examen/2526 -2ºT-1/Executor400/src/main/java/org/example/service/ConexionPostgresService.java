@@ -6,6 +6,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
@@ -18,7 +19,7 @@ public class ConexionPostgresService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private static final String POSTGRES_BASE_URL_LIBRO = "http://localhost:8081/postgres/libros";
+    private static final String POSTGRES_BASE_URL_LIBRO ="http://localhost:8081/postgres/libros";
 
     public List<Libro> buscarLibros() {
         try {
@@ -58,10 +59,16 @@ public class ConexionPostgresService {
                     url, HttpMethod.POST, request, Libro.class
             );
             return response.getBody();
+            // CAMBIO AQUÍ: Usamos RestClientException para atrapar TODO
         } catch (HttpClientErrorException e) {
             System.out.println("Erro al crear libro en Postgres: " + e.getMessage());
             return null;
+        } catch (RestClientException e) {
+            System.out.println("💥 Error crítico de conexión o del servidor Postgres (8081): " + e.getMessage());
+            return null;
+
         }
+
     }
 
     public Optional<Libro> libroPorID(String id) { // Changed ID type to String

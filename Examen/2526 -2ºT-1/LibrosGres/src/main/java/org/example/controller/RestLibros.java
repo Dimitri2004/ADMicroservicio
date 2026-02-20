@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/libros")
+@RequestMapping("postgres/libros")
 public class RestLibros {
 
     private final LibroService libroService;
@@ -35,17 +35,17 @@ public class RestLibros {
     }
 
     @PostMapping
-    public ResponseEntity<Libro> createLibro(@RequestBody LibroRequest libroRequest) {
+    public ResponseEntity<Libro> createLibro(@RequestBody Libro datos) {
         Libro newLibro = libroService.createLibro(
-                libroRequest.getTitulo(),
-                libroRequest.getAutor(),
-                libroRequest.getAnoPublicacion()
+                datos.getTitulo(),
+                datos.getAutor(),
+                datos.getAnoPublicacion()
         );
         return new ResponseEntity<>(newLibro, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Libro> updateLibro(@PathVariable String id, @RequestBody LibroRequest libroRequest) {
+    public ResponseEntity<Libro> updateLibro(@PathVariable String id, @RequestBody Libro libroRequest) {
         Libro updatedLibro = libroService.updateLibro(
                 id,
                 libroRequest.getTitulo(),
@@ -62,33 +62,4 @@ public class RestLibros {
     }
 
     // Inner class for request body
-    static class LibroRequest {
-        private String titulo;
-        private String autor;
-        private int anoPublicacion;
-
-        public String getTitulo() {
-            return titulo;
-        }
-
-        public void setTitulo(String titulo) {
-            this.titulo = titulo;
-        }
-
-        public String getAutor() {
-            return autor;
-        }
-
-        public void setAutor(String autor) {
-            this.autor = autor;
-        }
-
-        public int getAnoPublicacion() {
-            return anoPublicacion;
-        }
-
-        public void setAnoPublicacion(int anoPublicacion) {
-            this.anoPublicacion = anoPublicacion;
-        }
-    }
 }

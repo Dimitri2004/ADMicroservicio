@@ -24,25 +24,22 @@ public class Secuencia {
 
     public void executar() {
 
-        // Create a new Libro object with the updated structure
         Libro libro1 = new Libro();
-        libro1.setId(UUID.randomUUID().toString()); // Generate a unique ID for the new book
+        libro1.setId("123456");
         libro1.setTitulo("El Quijote");
         libro1.setAutor("Miguel de Cervantes");
         libro1.setAnoPublicacion(1605);
 
-        // Create a book in Postgres
-        libro1 = conexionPostgresService.crearLibro(libro1);
-        System.out.println("Libro creado en Postgres: " + libro1.getTitulo() + " con ID: " + libro1.getId());
+        // Intentar crear en Postgres
+        Libro guardado = conexionPostgresService.crearLibro(libro1);
 
-        // Example: Find a book by a sample ID from Postgres and save it to Mongo
-        // Assuming an external service might have a book with ID "sample-id-123"
-        String sampleId = "sample-id-123"; // Replace with an actual ID if known
-        Optional<Libro> libro2Optional = conexionPostgresService.libroPorID(sampleId);
-        libro2Optional.ifPresent(libro -> {
-            conexionMongoService.crearLibro(libro);
-            System.out.println("Libro con ID " + libro.getId() + " de Postgres guardado en Mongo: " + libro.getTitulo());
-        });
+        if (guardado == null) {
+            System.err.println("CRÍTICO: Postgres (8081) rechazó el libro. ¿Borraste la tabla y quitaste el @GeneratedValue?");
+            // Opcional: return; para no seguir si Postgres falla
+        } else {
+            libro1 = guardado;
+            System.out.println("Libro guardado correctamente: " + libro1);
+        }
 
         // Example: Find a book by title from Postgres and save it to Mongo
         Optional<Libro> libro3Optional = conexionPostgresService.libroPorTitulo("Cien años de soledad");
@@ -64,10 +61,10 @@ public class Secuencia {
         jsonService.exportarJSONLibros(allLibrosMongo);
         System.out.println("\nLibros exportados a JSON.");
 
-        // Delete the created book from Postgres
-        if (libro1.getId() != null) {
-            boolean deleted = conexionPostgresService.borrarLibro(libro1.getId());
-            System.out.println("Libro con ID " + libro1.getId() + " borrado de Postgres: " + deleted);
-        }
+//        // Delete the created book from Postgres
+//        if (libro1.getId() != null) {
+//            boolean deleted = conexionPostgresService.borrarLibro(libro1.getId());
+//            System.out.println("Libro con ID " + libro1.getId() + " borrado de Postgres: " + deleted);
+//        }
     }
 }

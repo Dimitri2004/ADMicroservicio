@@ -19,7 +19,7 @@ public class ConexionMongoService {
     private RestTemplate restTemplate;
 
     // Assuming an external MongoDB service running on port 8082, for example
-    private static final String MONGO_BASE_URL_LIBRO = "http://localhost:8082/mongo/libros";
+    private static final String MONGO_BASE_URL_LIBRO = "http://localhost:8080/mongo/libros";
 
     public List<Libro> buscarLibros() {
         try {

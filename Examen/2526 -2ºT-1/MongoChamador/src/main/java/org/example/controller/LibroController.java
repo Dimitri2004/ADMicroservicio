@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/libros")
+@RequestMapping("/mongo/libros")
 public class LibroController {
 
     private final LibroService libroService;
@@ -52,6 +52,15 @@ public class LibroController {
         if (libroService.findById(id).isPresent()) {
             libroService.deleteById(id);
             return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/titulo/{titulo}")
+    public ResponseEntity<Libro> getLibroByTitulo(@PathVariable String titulo) {
+        Libro libro = libroService.findByTitulo(titulo);
+        if (libro != null) {
+            return ResponseEntity.ok(libro);
         } else {
             return ResponseEntity.notFound().build();
         }

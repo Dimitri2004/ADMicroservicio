@@ -1,13 +1,10 @@
 package org.example.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 
-@Entity
-@Table(name = "libros") // Assuming a table named 'libros' in PostgreSQL
+
+
+
 public class Libro {
-    @Id
     private String id;
     private String titulo;
     private String autor;
@@ -59,10 +56,10 @@ public class Libro {
     @Override
     public String toString() {
         return "Libro{" +
-               "id='" + id + '\'' +
-               ", titulo='" + titulo + '\'' +
-               ", autor='" + autor + '\'' +
-               ", anoPublicacion=" + anoPublicacion +
-               '}';
+                "id='" + id + '\'' +
+                ", titulo='" + titulo + '\'' +
+                ", autor='" + autor + '\'' +
+                ", anoPublicacion=" + anoPublicacion +
+                '}';
     }
 }
